@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getDecodedToken } from "./utils/authHelpers";
 import * as jwtDecode from "jwt-decode";
 import { IJwtPayload } from "./interfaces/payloadJwt";
 

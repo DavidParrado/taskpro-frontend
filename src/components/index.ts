@@ -7,6 +7,7 @@ export * from "./ui/Navbar";
 export * from "./ui/Sidebar";
 export * from "./ui/Footer";
 export * from "./ui/PopupWidget";
+export * from "./ui/Spinner";
 
 export * from "./landing/Landing";
 export * from "./landing/Container";
