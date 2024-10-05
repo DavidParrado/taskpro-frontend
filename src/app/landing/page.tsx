@@ -1,9 +1,8 @@
-'use client';
 
-import { Benefits, Container, Cta, Faq, Hero, SectionTitle, Testimonials, Video } from '..';
+import { Benefits, Container, Cta, Faq, Hero, SectionTitle, Testimonials, Video } from '@/components';
 import { benefitOne, benefitTwo } from "@/components/ui/data";
 
-export const LandingPage = () => {
+export default function Home() {
   return (
     <Container>
       <Hero />
@@ -49,4 +48,4 @@ export const LandingPage = () => {
       <Cta />
     </Container>
   );
-};
+}
