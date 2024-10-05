@@ -1,6 +1,6 @@
 
 import { Benefits, Container, Cta, Faq, Hero, SectionTitle, Testimonials, Video } from '@/components';
-import { benefitOne, benefitTwo } from "@/components/ui/data";
+import { benefitOne, benefitTwo } from "@/components/landing/data";
 
 export default function Home() {
   return (

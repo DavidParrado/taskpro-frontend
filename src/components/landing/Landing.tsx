@@ -1,7 +1,7 @@
 'use client';
 
 import { Benefits, Container, Cta, Faq, Hero, SectionTitle, Testimonials, Video } from '..';
-import { benefitOne, benefitTwo } from "@/components/ui/data";
+import { benefitOne, benefitTwo } from "./data";
 
 export const LandingPage = () => {
   return (

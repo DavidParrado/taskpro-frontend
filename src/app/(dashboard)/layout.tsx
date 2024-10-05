@@ -1,23 +1,27 @@
-// components/Layout.tsx
-import { ReactNode } from 'react';
-import { Navbar, Sidebar } from '../../components'; // Asumimos que ya lo has creado
+import type { Metadata } from "next";
 
-interface LayoutProps {
-  children: ReactNode;
-}
+import { Sidebar } from "@/components";
+import { PopupWidget } from "@/components";
+import { Topbar } from "@/components";
 
-const Layout = ({ children }: LayoutProps) => {
-  return (
-    <div className="layout-container">
-      <Navbar />
-      <div className="main-content">
-        <Sidebar />
-        <div className="page-content">
-          {children} {/* Aquí va el contenido dinámico de cada página */}
-        </div>
-      </div>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "TaskPro",
+  description: "Application for task management",
 };
 
-export default Layout;
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <main className="h-screen w-full">
+      <Topbar />
+      <div className="flex w-full h-[calc(100%-69px)]">
+        <Sidebar />
+        <div className="w-full px-8 py-6">{children}</div>
+      </div>
+      <PopupWidget />
+    </main>
+  );
+}
