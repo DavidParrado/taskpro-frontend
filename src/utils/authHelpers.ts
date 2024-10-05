@@ -1,26 +1,17 @@
 // utils/authHelpers.ts
-import jwt from "jsonwebtoken";
+import * as jwtDecode from "jwt-decode";
 import Cookies from 'js-cookie';
+import { IJwtPayload } from "@/interfaces/payloadJwt";
 
-// Define el tipo para el payload del JWT (puedes personalizarlo según los datos que el backend envíe)
-interface JwtPayload {
-  id: string;
-  name: string;
-  email: string;
-  exp: number; // Tiempo de expiración del token (timestamp)
-}
-
-
-// Replace with your JWT secret key
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-
-// Extract user data from token (return null if invalid)
-export const getUserFromToken = (token: string | null) => {
+// Extract payload data from token (return null if invalid)
+export const getDecodedToken = () => {
+  const token = getToken(); // Get token from cookies
   if (!token) return null;
   try {
-    const decoded = jwt.verify(token, JWT_SECRET); // Decode and verify token
-    return decoded; // The decoded user data (like id, email)
+    const decoded = jwtDecode.jwtDecode<IJwtPayload>(token); // Decode token
+    return decoded; // Return decoded token
   } catch (err) {
+    console.log(err);
     return null; // Invalid token
   }
 };

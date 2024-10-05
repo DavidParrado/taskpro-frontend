@@ -22,12 +22,12 @@ export const Navbar = () => {
             <Image
               src="/imgs/logo.svg"
               width="32"
-              alt="N"
+              alt="T"
               height="32"
               className="w-8"
             />
           </span>
-          <span>Nextly</span>
+          <span>Taskpro</span>
         </span>
       </Link>
 

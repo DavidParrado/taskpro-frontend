@@ -2,6 +2,8 @@
 import Link from "next/link";
 import ThemeChanger from "../landing/DarkSwitch";
 import Image from "next/image"
+import { getDecodedToken } from "@/utils/authHelpers";
+import { useEffect, useState } from "react";
 
 export const Topbar = () => {
   const navigation = [
@@ -11,6 +13,16 @@ export const Topbar = () => {
     "Company",
     "Blog",
   ];
+
+  const [userName, setUserName] = useState("User");
+  const user = getDecodedToken();
+
+  useEffect(() => {
+    if( user ) {
+      setUserName(user.name);
+    }
+  }, [])
+  
 
   return (
     <nav className="w-full relative flex flex-wrap items-center justify-between py-3 px-4 lg:px-6 xl:px-8 border-b">
@@ -26,7 +38,7 @@ export const Topbar = () => {
               className="w-8"
             />
           </span>
-          <span>Nextly</span>
+          <span>Taskpro</span>
         </span>
       </Link>
 
@@ -35,7 +47,7 @@ export const Topbar = () => {
         <ThemeChanger />
         <div className="hidden mr-3 lg:flex nav__item">
           <Link href="/" className="px-6 py-2 text-white bg-indigo-600 rounded-md md:ml-5">
-            Get Started
+            {userName}
           </Link>
         </div>
       </div>
