@@ -13,6 +13,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { login } from '@/actions';
 import { setToken } from '@/utils/authHelpers';
+import { createTokenCookie } from '@/actions/cookies/token';
+import { getToken } from '../../utils/authHelpers';
 
 type FormInputs = {
   email: string;
@@ -45,6 +47,7 @@ export const LoginForm = () => {
       return;
     };
     setToken(resp.token);
+    createTokenCookie(resp.getToken);
     router.push('/')
 
   }

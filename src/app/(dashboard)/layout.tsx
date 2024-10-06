@@ -15,7 +15,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-screen w-full">
+    <main className="h-full w-full">
       <Topbar />
       <div className="flex w-full h-[calc(100%-69px)]">
         <Sidebar />

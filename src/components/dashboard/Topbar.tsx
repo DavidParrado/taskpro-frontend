@@ -7,17 +7,17 @@ import { useEffect, useState } from "react";
 
 export const Topbar = () => {
   const [userName, setUserName] = useState("User");
-  const user = getDecodedToken();
+  const decoded = getDecodedToken();
 
   useEffect(() => {
-    if( user ) {
-      setUserName(user.name);
+    if( decoded ) {
+      setUserName(decoded.user.name);
     }
   }, [])
   
 
   return (
-    <nav className="w-full relative flex flex-wrap items-center justify-between py-3 px-4 lg:px-6 xl:px-8 border-b">
+    <nav className="w-full relative flex flex-wrap items-center justify-between py-3 px-4 lg:px-6 xl:px-8 border-b dark:border-b-slate-500">
       {/* Logo  */}
       <Link href="/">
         <span className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const Sidebar = () => {
   return (
-    <div className="w-64 bg-white dark:bg-black dark:text-slate-300 text-black py-5 px-4 lg:px-6 xl:px-8 border-r">
+    <div className="w-64 bg-white dark:bg-trueGray-900 dark:text-slate-300 text-black py-5 px-4 lg:px-6 xl:px-8 border-r dark:border-r-slate-500">
       <ul className="list-none p-0">
         <li className="mb-4">
           <Link href="/projects" className="dark:text-slate-300 text-black text-lg hover:underline">

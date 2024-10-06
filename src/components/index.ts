@@ -2,6 +2,8 @@ export * from "./auth/LoginForm";
 export * from "./auth/RegisterForm";
 
 export * from "./dashboard/Topbar";
+export * from "./dashboard/projects/CreateProjectModal";
+export * from "./dashboard/projects/Projects";
 
 export * from "./ui/Navbar";
 export * from "./ui/Sidebar";

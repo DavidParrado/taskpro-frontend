@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { registerUser } from '@/actions';
 import { setToken } from '@/utils/authHelpers';
+import { createTokenCookie } from '@/actions/cookies/token';
 
 type FormInputs = {
   name: string;
@@ -48,6 +49,7 @@ export const RegisterForm = () => {
     };
 
     setToken(resp.token);
+    createTokenCookie(resp.token);
     router.push('/');
 
   }
