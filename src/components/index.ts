@@ -2,14 +2,12 @@ export * from "./auth/LoginForm";
 export * from "./auth/RegisterForm";
 
 export * from "./dashboard/Topbar";
-export * from "./dashboard/projects/CreateProjectModal";
-export * from "./dashboard/projects/Projects";
+export * from "./dashboard/projects/ProjectModal";
 export * from "./dashboard/projects/ProjectList";
 export * from "./dashboard/projects/TaskModal";
 export * from "./dashboard/projects/skeletons/ProjectViewSkeleton";
 export * from "./dashboard/projects/skeletons/ProjectModalSkeleton";
 export * from "./dashboard/projects/KanbanBoard";
-export * from "./dashboard/projects/EditProjectModal";
 
 export * from "./ui/Navbar";
 export * from "./ui/Sidebar";

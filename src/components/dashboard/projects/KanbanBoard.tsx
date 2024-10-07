@@ -1,53 +1,90 @@
-import { ITask } from "@/interfaces/task";
-import { TaskStatus } from "@/utils/enums";
+'use client';
+import { useDrag, useDrop } from 'react-dnd';
+import { ITask } from '@/interfaces/task';
+import { TaskStatus } from '@/utils/enums';
+
+const ITEM_TYPE = 'TASK';
 
 interface Props {
   tasks: ITask[];
+  moveTask: (taskId: string, status: TaskStatus) => void;
 }
 
-// todo: Missing dark theme
-export const KanbanBoard = ({ tasks }: Props) => {
-  console.log(tasks);
-  console.log(tasks.filter(task => task.status === TaskStatus.TODO));
-  console.log(tasks.filter(task => task.status === TaskStatus.IN_PROGRESS));
-  console.log(tasks.filter(task => task.status === TaskStatus.COMPLETED));
+export const KanbanBoard = ({ tasks, moveTask }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-4">
+
       {/* To Do Column */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">To Do</h2>
-        <div className="bg-gray-200 p-4 rounded-lg min-h-[300px]">
-          {tasks.filter(task => task.status === TaskStatus.TODO).map(task => (
-            <div key={task.id} className="bg-white p-2 mb-2 rounded shadow">
-              {task.title}
-            </div>
-          ))}
-        </div>
-      </div>
+      <KanbanColumn
+        status={TaskStatus.TODO}
+        tasks={tasks.filter((task) => task.status === TaskStatus.TODO)}
+        moveTask={moveTask}
+      />
 
       {/* In Progress Column */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">In Progress</h2>
-        <div className="bg-gray-200 p-4 rounded-lg min-h-[300px]">
-          {tasks.filter(task => task.status === TaskStatus.IN_PROGRESS).map(task => (
-            <div key={task.id} className="bg-white p-2 mb-2 rounded shadow">
-              {task.title}
-            </div>
-          ))}
-        </div>
-      </div>
+      <KanbanColumn
+        status={TaskStatus.IN_PROGRESS}
+        tasks={tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS)}
+        moveTask={moveTask}
+      />
 
       {/* Completed Column */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Completed</h2>
-        <div className="bg-gray-200 p-4 rounded-lg min-h-[300px]">
-          {tasks.filter(task => task.status === TaskStatus.COMPLETED).map(task => (
-            <div key={task.id} className="bg-white p-2 mb-2 rounded shadow">
-              {task.title}
-            </div>
-          ))}
-        </div>
-      </div>
+      <KanbanColumn
+        status={TaskStatus.COMPLETED}
+        tasks={tasks.filter((task) => task.status === TaskStatus.COMPLETED)}
+        moveTask={moveTask}
+      />
+
     </div>
   );
+};
+
+interface ColumnProps {
+  status: TaskStatus;
+  tasks: ITask[];
+  moveTask: (taskId: string, status: TaskStatus) => void;
 }
+
+const KanbanColumn = ({ status, tasks, moveTask }: ColumnProps) => {
+  const [{ isOver }, drop] = useDrop({
+    accept: ITEM_TYPE,
+    drop: (item: { id: string }) => {
+      moveTask(item.id, status); // Move task to this column
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  });
+
+  return (
+    <div ref={drop as any} className={`p-4 rounded-lg min-h-[300px] ${isOver ? 'bg-indigo-100' : 'bg-gray-200'}`}>
+      <h2 className="text-xl font-bold mb-4">{status}</h2>
+      {tasks.map((task) => (
+        <KanbanTask key={task.id} task={task} />
+      ))}
+    </div>
+  );
+};
+
+interface TaskProps {
+  task: ITask;
+}
+
+const KanbanTask = ({ task }: TaskProps) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: ITEM_TYPE,
+    item: { id: task.id },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
+  return (
+    <div
+      ref={drag as any}
+      className={`p-2 mb-2 rounded shadow bg-white cursor-pointer hover:bg-opacity-80 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+    >
+      {task.title}
+    </div>
+  );
+};

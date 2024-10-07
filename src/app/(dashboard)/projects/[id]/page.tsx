@@ -1,35 +1,52 @@
 'use client';
 import { useEffect, useState } from "react";
-import { KanbanBoard, ProjectViewSkeleton, TaskModal } from "@/components"; // Modal to create a new task
+import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskModal } from "@/components"; // Modal to create a new task
 import { getProjectById } from "@/actions/projects/getProjectById";
 import { useParams } from "next/navigation";
 import { getToken } from "@/utils/authHelpers";
 import { IProject } from "@/interfaces";
-import { ProjectStatus } from "@/utils/enums";
+import { ProjectStatus, TaskStatus } from "@/utils/enums";
 import { EditProjectModal } from "@/components/dashboard/projects/EditProjectModal";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const ProjectPage = () => {
   const [project, setProject] = useState<IProject>({ name: "Proyecto 1", description: "Description 1", id: "1", createdAt: "2021-10-01T00:00:00.000Z", updatedAt: "2021-10-01T00:00:00.000Z", owner: { id: "1", email: "", name: "", roles: [] }, status: ProjectStatus.IN_PROGRESS, tasks: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const { id } = useParams<{ id: string }>();
 
   const openTaskModal = () => setIsTaskModalOpen(true);
   const closeTaskModal = () => setIsTaskModalOpen(false);
-  const handleOpenEditModal = () => setIsEditModalOpen(true);
-  const handleCloseEditModal = () => setIsEditModalOpen(false);
+  const handleOpenEditModal = () => setIsProjectModalOpen(true);
+  const handleCloseEditModal = () => setIsProjectModalOpen(false);
 
   const handleProjectUpdate = (updatedProject: IProject) => {
     setProject((project) => ({ ...project, ...updatedProject }));
-    setIsEditModalOpen(false);
+    setIsProjectModalOpen(false);
   }
 
   const handleTaskCreate = (task: any) => {
     setProject((project) => ({ ...project, tasks: [task, ...project.tasks] }));
     setIsTaskModalOpen(false);
   }
+
+
+  const moveTask = async (taskId: string, newStatus: TaskStatus) => {
+    // Verify if the status is not the same
+    if (project.tasks.find((task) => task.id === taskId)?.status === newStatus) return;
+    setProject((project) => ({
+      ...project,
+      tasks: project.tasks.map((task) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      )
+    }));
+    // Update task status in the server
+    // await 
+    console.log("Task moved to", newStatus);
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -80,17 +97,19 @@ const ProjectPage = () => {
         </button>
 
         {/* Kanban Board */}
-        <KanbanBoard tasks={project.tasks} />
+        <DndProvider backend={HTML5Backend}>
+          <KanbanBoard tasks={project.tasks} moveTask={moveTask} />
+        </DndProvider>
 
         {/* Task Modal */}
         {isTaskModalOpen && <TaskModal onCreateTask={handleTaskCreate} isOpen={isTaskModalOpen} onClose={closeTaskModal} projectId={project.id} />}
         {/* Modal to edit project */}
-        {isEditModalOpen && (
-          <EditProjectModal
-            isOpen={isEditModalOpen}
+        {isProjectModalOpen && (
+          <ProjectModal
+            isOpen={isProjectModalOpen}
             project={project}
             onClose={handleCloseEditModal}
-            onSave={handleProjectUpdate}
+            handleProjectSubmit={handleProjectUpdate}
           />
         )}
       </div>
