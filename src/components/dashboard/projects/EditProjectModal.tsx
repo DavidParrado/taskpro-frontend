@@ -1,74 +1,75 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-
-import { SubmitHandler, useForm, Controller } from 'react-hook-form';
+import Modal from 'react-modal';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z, { ZodType } from 'zod';
-
-import Modal from 'react-modal';
-
-import { createProject } from '@/actions';
 import { ProjectStatus } from '@/utils/enums';
+import { IProject } from '@/interfaces';
+import { ProjectModalSkeleton } from '@/components';
+import { updateProject } from '@/actions';
 import { getToken } from '@/utils/authHelpers';
 
-Modal.setAppElement('#root'); // To bind modal to the Next.js app
+Modal.setAppElement('#root');
 
-// Define the form inputs for the project creation
 type FormInputs = {
   name: string;
   status: ProjectStatus;
   description?: string;
   startDate?: Date;
   endDate?: Date;
+};
+
+interface Props {
+  isOpen: boolean;
+  project: IProject;
+  onSave: (updatedProject: IProject) => void;
+  onClose: () => void;
 }
+
 const schemaValidator: ZodType<FormInputs> = z.object({
   name: z.string().min(1, "Project name is required"),
   status: z.nativeEnum(ProjectStatus),
   description: z.string().optional(),
-  // Add custom validations for the dates, like the start date should be before the end date
   startDate: z.date().optional(),
   endDate: z.date().optional(),
 }).refine(({ startDate, endDate }) => {
   if (!startDate || !endDate) return true;
-  console.log(startDate, endDate)
   return endDate >= startDate;
 }, {
   message: "End date should be after start date",
   path: ['endDate']
-})
+});
 
-
-interface Props {
-  isOpen: boolean;
-  onCreate: (project: any) => void;
-  onClose: () => void;
-}
-
-export const CreateProjectModal = ({ isOpen, onClose, onCreate }: Props) => {
+export const EditProjectModal = ({ isOpen, project, onSave, onClose }: Props) => {
   let modalRef = React.useRef<HTMLDivElement>(null);
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
-
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator) });
+  const { register, handleSubmit, formState: { errors, defaultValues }, reset } = useForm<FormInputs>({
+    resolver: zodResolver(schemaValidator),
+    defaultValues: {
+      ...project,
+      startDate: project.startDate ? new Date(project.startDate).toLocaleDateString("af-ZA") as any : undefined,
+      endDate: project.endDate ? new Date(project.endDate).toLocaleDateString("af-ZA") as any : undefined
+    }
+  });
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     setErrorMessage('');
     const token = getToken() || "";
-    console.log(data)
     // Server action
-    const resp = await createProject(data, token);
+    const resp = await updateProject(project.id, data, token);
     if (!resp) {
       setErrorMessage(resp.message);
       return;
     };
-    console.log(resp);
-    onCreate(resp);
+    onSave(resp);
     reset();
-  }
+  };
 
   useEffect(() => {
+    console.log(defaultValues)
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
@@ -82,99 +83,83 @@ export const CreateProjectModal = ({ isOpen, onClose, onCreate }: Props) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [defaultValues]);
+
+  useEffect(() => {
+    setIsLoading(false);
   }, []);
 
-  return (
+  return isLoading ? <ProjectModalSkeleton /> : (
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
       className="fixed inset-0 flex items-center justify-center"
       overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-      contentLabel="Create Project Modal"
     >
       <div ref={modalRef} className="bg-white dark:bg-trueGray-900 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Create New Project</h2>
+        <h2 className="text-2xl font-bold mb-4">Edit Project</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label htmlFor="project-name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Project Name</label>
+            <label className="block text-sm font-medium">Project Name</label>
             <input
               type="text"
-              id="project-name"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
               {...register('name')}
             />
-            {
-              errors.name?.message && (
-                <span className="text-indigo-900 dark:text-white text-sm">{errors.name.message}</span>
-              )
-            }
+            {errors.name && <span className="text-indigo-800 dark:text-white">{errors.name.message}</span>}
           </div>
           <div>
-            <label htmlFor="project-description" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
+            <label className="block text-sm font-medium">Description</label>
             <textarea
-              id="project-description"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               {...register('description')}
-            ></textarea>
+            />
           </div>
-          {/* Select for project status */}
           <div>
-            <label htmlFor="project-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
+            <label className="block text-sm font-medium">Status</label>
             <select
-              id="project-status"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
               {...register('status')}
             >
-              {/* Use the enum values for the options */}
               <option value="">Select Status</option>
-              {Object.values(ProjectStatus).map((status) => (
-                // capitalize the first letter of the status
-                <option key={status} value={status}>{status[0].toUpperCase() + status.slice(1)}</option>
+              {Object.values(ProjectStatus).map(status => (
+                <option key={status} value={status}>{status.toLocaleUpperCase()}</option>
               ))}
             </select>
-            {
-              errors.status?.message && (
-                <span className="text-indigo-900 dark:text-white text-sm">{errors.status.message}</span>
-              )
-            }
           </div>
-
-          {/* Date picker for startDate and endDate of the project */}
           <div>
-            <label htmlFor="project-start-date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Start Date</label>
+            <label className="block text-sm font-medium">Start Date</label>
             <input
               type="date"
-              id="project-start-date"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               {...register('startDate', { valueAsDate: true })}
             />
-            {errors.startDate?.message && (<span className="text-indigo-900 dark:text-white text-sm">{errors.startDate.message}</span>)}
           </div>
           <div>
-            <label htmlFor="project-end-date" className="block text-sm font-medium text-gray-700 dark:text-gray-200">End Date</label>
+            <label className="block text-sm font-medium">End Date</label>
             <input
               type="date"
-              id="project-end-date"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               {...register('endDate', { valueAsDate: true })}
             />
-            {errors.endDate?.message && (<span className="text-indigo-900 dark:text-white text-sm">{errors.endDate.message}</span>)}
+            {errors.endDate && <span className="text-indigo-800 dark:text-white">{errors.endDate.message}</span>}
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-white text-indigo-900 rounded-md border border-indigo-700">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            >
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-              Create Project
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              Save Changes
             </button>
           </div>
-          {
-            errorMessage && (
-              <span className="text-indigo-900 dark:text-white">{errorMessage}</span>
-            )
-          }
+          {errorMessage && <span className="text-indigo-800 dark:text-white">{errorMessage}</span>}
         </form>
       </div>
     </Modal>

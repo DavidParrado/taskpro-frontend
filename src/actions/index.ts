@@ -3,3 +3,7 @@ export { registerUser } from "./auth/register";
 
 export { getProjectsByUser } from "./projects/getProjectsByUser";
 export { createProject } from "./projects/createProject";
+export { getProjectById } from "./projects/getProjectById";
+export { updateProject } from "./projects/updateProject";
+
+export { getTags } from "./tag/getTags";

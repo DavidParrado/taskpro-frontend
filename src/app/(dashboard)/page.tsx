@@ -1,13 +1,7 @@
-import { Projects } from "@/components";
-import { cookies } from "next/headers";
+import { redirect } from 'next/navigation';
 
-const Dashboard = async () => {
-
-  const token = cookies().get("token");
-  console.log(token);
-  return (
-    <Projects />
-  );
+const Page = () => {
+  redirect('/projects');
 }
 
-export default Dashboard;
+export default Page

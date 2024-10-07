@@ -15,11 +15,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-full w-full">
+    <main className="h-screen w-full">
       <Topbar />
       <div className="flex w-full h-[calc(100%-69px)]">
         <Sidebar />
-        <div className="w-full px-8 py-6">{children}</div>
+        <div className="w-full px-8 py-6 overflow-y-auto">{children}</div>
       </div>
       <PopupWidget />
     </main>

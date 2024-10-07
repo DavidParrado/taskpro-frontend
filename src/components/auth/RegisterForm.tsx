@@ -13,7 +13,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { registerUser } from '@/actions';
 import { setToken } from '@/utils/authHelpers';
-import { createTokenCookie } from '@/actions/cookies/token';
 
 type FormInputs = {
   name: string;
@@ -33,7 +32,7 @@ const schemaValidator: ZodType<FormInputs> = z.object({
 export const RegisterForm = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator) });
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator), defaultValues: { name: 'John', lastName: 'Smith', email: 'johndoe@gmail.com', password: 'Prueba123' } });
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
@@ -42,15 +41,20 @@ export const RegisterForm = () => {
     const { name, lastName, email, password } = data;
 
     // Server action
-    const resp = await registerUser({ name, lastName, email, password });
-    if (!resp) {
-      setErrorMessage(resp.message);
+    try {
+      const resp = await registerUser({ name, lastName, email, password });
+      if (!resp) {
+        setErrorMessage(resp.message);
+        return;
+      };
+      setToken(resp.token);
+      router.push('/');
+    } catch (error) {
+      console.log(error)
+      setErrorMessage("Error al registrar el usuario");
       return;
-    };
+    }
 
-    setToken(resp.token);
-    createTokenCookie(resp.token);
-    router.push('/');
 
   }
 

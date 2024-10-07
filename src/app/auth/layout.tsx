@@ -10,22 +10,29 @@ export default function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // Track auth state
   const router = useRouter();
 
   useEffect(() => {
     const decoded = getDecodedToken();
 
-    if (decoded) {
-      router.push('/'); // Redirect if authenticated
-      setIsAuthenticated(true); // User is authenticated
-    } else {
-      setIsAuthenticated(false); // User is not authenticated
+    if (!decoded) {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
     }
+    if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
+    }
+    setIsAuthenticated(true);
+    setIsLoading(false);
+    router.push('/')
   }, [router]);
 
-  if (isAuthenticated) {
+  if (!isAuthenticated && isLoading) {
     // While we're checking the authentication state, you could return a loading spinner or nothing
     return (
       <div className='flex w-screen h-screen items-center justify-center'>

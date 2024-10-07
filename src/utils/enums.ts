@@ -4,11 +4,10 @@ export enum ProjectStatus {
 }
 
 export enum TaskStatus {
-  PENDING = "pendiente",
-  IN_PROGRESS = "en progreso",
-  COMPLETED = "completado",
+  TODO = "Pendiente",
+  IN_PROGRESS = "En progreso",
+  COMPLETED = "Completado",
 }
-
 export enum UserRole {
   USER = "user",
   ADMIN = "admin",

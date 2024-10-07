@@ -26,9 +26,9 @@ export const Projects = ({ projects }: Props) => {
 
   useEffect(() => {
     const token = getToken() || "";
-    const { user } = getDecodedToken() as IJwtPayload;
+    const decoded = getDecodedToken() as IJwtPayload;
 
-    getProjectsByUser(user.id, token).then((projects) => {
+    getProjectsByUser(decoded.user.id, token).then((projects) => {
       setProjectList(projects);
     }).catch((err) => {
       console.error(err);

@@ -14,7 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { login } from '@/actions';
 import { setToken } from '@/utils/authHelpers';
 import { createTokenCookie } from '@/actions/cookies/token';
-import { getToken } from '../../utils/authHelpers';
 
 type FormInputs = {
   email: string;
@@ -32,7 +31,7 @@ export const LoginForm = () => {
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator) });
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator), defaultValues: { email: 'prueba@gmail.com', password: 'Prueba123' } });
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
@@ -46,8 +45,8 @@ export const LoginForm = () => {
       setErrorMessage(resp.message);
       return;
     };
+    console.log(resp)
     setToken(resp.token);
-    createTokenCookie(resp.getToken);
     router.push('/')
 
   }
