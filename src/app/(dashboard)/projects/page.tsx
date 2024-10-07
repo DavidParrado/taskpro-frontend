@@ -1,9 +1,9 @@
 'use client';
 import { useEffect, useState } from "react";
 
-import { ProjectModal, ProjectList } from '@/components';
+import { ProjectModal, ProjectList, ProjectFormInputs } from '@/components';
 import { getDecodedToken, getToken } from "@/utils/authHelpers";
-import { getProjectsByUser } from "@/actions";
+import { createProject, getProjectsByUser } from "@/actions";
 import { IJwtPayload, IProject } from "@/interfaces";
 
 interface Props {
@@ -18,9 +18,16 @@ const ProjectsPage = ({ projects }: Props) => {
     setIsModalOpen(false);
   }
 
-  const handleCreateProject = (project: IProject) => {
-    setProjectList([project, ...projectList]);
-    onClose();
+  // Handler to create a new project
+  const handleCreateProject = async (projectFormData: ProjectFormInputs) => {
+    const token = getToken() || "";
+    try {
+      const newProject = await createProject(projectFormData, token);
+      setProjectList((projects) => [newProject, ...projects]);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {

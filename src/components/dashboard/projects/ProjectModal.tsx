@@ -7,23 +7,21 @@ import z, { ZodType } from 'zod';
 
 import Modal from 'react-modal';
 
-import { createProject } from '@/actions';
 import { ProjectStatus } from '@/utils/enums';
-import { getToken } from '@/utils/authHelpers';
 import { ProjectModalSkeleton } from './skeletons/ProjectModalSkeleton';
 import { IProject } from '@/interfaces';
 
 Modal.setAppElement('#root'); // To bind modal to the Next.js app
 
 // Define the form inputs for the project creation
-type FormInputs = {
+export type ProjectFormInputs = {
   name: string;
   status: ProjectStatus;
   description?: string;
   startDate?: Date;
   endDate?: Date;
 }
-const schemaValidator: ZodType<FormInputs> = z.object({
+const schemaValidator: ZodType<ProjectFormInputs> = z.object({
   name: z.string().min(1, "Project name is required"),
   status: z.nativeEnum(ProjectStatus),
   description: z.string().optional(),
@@ -42,7 +40,7 @@ const schemaValidator: ZodType<FormInputs> = z.object({
 interface Props {
   isOpen: boolean;
   project?: IProject;
-  handleProjectSubmit: (project: IProject) => void;
+  handleProjectSubmit: (project: ProjectFormInputs) => Promise<void>;
   onClose: () => void;
 }
 
@@ -53,7 +51,7 @@ export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: 
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormInputs>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProjectFormInputs>({
     resolver: zodResolver(schemaValidator), defaultValues: {
       name: project?.name || "",
       status: project?.status,
@@ -63,17 +61,15 @@ export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: 
     }
   });
 
-  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
+  const onSubmit: SubmitHandler<ProjectFormInputs> = async (data) => {
     setErrorMessage('');
-    const token = getToken() || "";
-    // Server action
-    const resp = await createProject(data, token);
-    if (!resp) {
-      setErrorMessage(resp.message);
-      return;
-    };
-    console.log(resp);
-    handleProjectSubmit(resp);
+    console.log(data)
+    try {
+      await handleProjectSubmit(data);
+    } catch (error) {
+      console.log(error);
+      setErrorMessage("No se pudo actualizar/crear el proyecto");
+    }
     reset();
   }
 

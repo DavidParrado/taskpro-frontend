@@ -6,7 +6,7 @@ export const updateTaskStatus = async (
   token: string
 ) => {
   try {
-    const res = await fetch(`${API_URL}/tasks/${taskId}/status`, {
+    const res = await fetch(`${API_URL}/api/tasks/${taskId}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

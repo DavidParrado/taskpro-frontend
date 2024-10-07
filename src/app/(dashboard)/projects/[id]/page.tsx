@@ -1,14 +1,16 @@
 'use client';
 import { useEffect, useState } from "react";
-import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskModal } from "@/components"; // Modal to create a new task
-import { getProjectById } from "@/actions/projects/getProjectById";
 import { useParams } from "next/navigation";
+
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
 import { getToken } from "@/utils/authHelpers";
 import { IProject } from "@/interfaces";
 import { ProjectStatus, TaskStatus } from "@/utils/enums";
-import { EditProjectModal } from "@/components/dashboard/projects/EditProjectModal";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+
+import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskModal } from "@/components"; // Modal to create a new task
+import { updateTaskStatus, getProjectById, updateProject, createTask } from "@/actions";
 
 const ProjectPage = () => {
   const [project, setProject] = useState<IProject>({ name: "Proyecto 1", description: "Description 1", id: "1", createdAt: "2021-10-01T00:00:00.000Z", updatedAt: "2021-10-01T00:00:00.000Z", owner: { id: "1", email: "", name: "", roles: [] }, status: ProjectStatus.IN_PROGRESS, tasks: [] });
@@ -23,14 +25,32 @@ const ProjectPage = () => {
   const handleOpenEditModal = () => setIsProjectModalOpen(true);
   const handleCloseEditModal = () => setIsProjectModalOpen(false);
 
-  const handleProjectUpdate = (updatedProject: IProject) => {
-    setProject((project) => ({ ...project, ...updatedProject }));
-    setIsProjectModalOpen(false);
+  const handleProjectUpdate = async (updatedProject: any) => {
+    setIsLoading(true);
+    try {
+      await updateProject(project.id, updatedProject, getToken() || "");
+      setProject((project) => ({ ...project, ...updatedProject }));
+      setIsLoading(false);
+      setIsProjectModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
   }
 
-  const handleTaskCreate = (task: any) => {
-    setProject((project) => ({ ...project, tasks: [task, ...project.tasks] }));
-    setIsTaskModalOpen(false);
+  const handleTaskCreate = async (task: any) => {
+    setIsLoading(true);
+    try {
+      const resp = await createTask({ ...task, projectId: project.id }, getToken() || "");
+      console.log(resp);
+      setProject((project) => ({ ...project, tasks: [resp, ...project.tasks] }));
+      setIsTaskModalOpen(false);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsTaskModalOpen(false);
+      setIsLoading(false);
+    }
   }
 
 
@@ -44,8 +64,7 @@ const ProjectPage = () => {
       )
     }));
     // Update task status in the server
-    // await 
-    console.log("Task moved to", newStatus);
+    await updateTaskStatus(taskId, newStatus, getToken() || "");
   };
 
   useEffect(() => {
@@ -102,7 +121,7 @@ const ProjectPage = () => {
         </DndProvider>
 
         {/* Task Modal */}
-        {isTaskModalOpen && <TaskModal onCreateTask={handleTaskCreate} isOpen={isTaskModalOpen} onClose={closeTaskModal} projectId={project.id} />}
+        {isTaskModalOpen && <TaskModal handleSubmitTask={handleTaskCreate} isOpen={isTaskModalOpen} onClose={closeTaskModal} />}
         {/* Modal to edit project */}
         {isProjectModalOpen && (
           <ProjectModal

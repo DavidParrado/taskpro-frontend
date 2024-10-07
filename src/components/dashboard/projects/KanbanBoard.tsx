@@ -2,6 +2,11 @@
 import { useDrag, useDrop } from 'react-dnd';
 import { ITask } from '@/interfaces/task';
 import { TaskStatus } from '@/utils/enums';
+import { useState } from 'react';
+import { TaskFormInputs, TaskModal } from './TaskModal';
+import { updateTaskStatus } from '@/actions';
+import { getToken } from '@/utils/authHelpers';
+import { updateTask } from '@/actions/task/updateTask';
 
 const ITEM_TYPE = 'TASK';
 
@@ -71,6 +76,17 @@ interface TaskProps {
 }
 
 const KanbanTask = ({ task }: TaskProps) => {
+  const [isTaskModalOpen, setisTaskModalOpen] = useState(false);
+
+  const openTaskModal = () => setisTaskModalOpen(true);
+  const closeTaskModal = () => setisTaskModalOpen(false);
+
+  const handleSubmitTask = async (taskFormData: TaskFormInputs) => {
+    // Update task in the server
+    await updateTask(task.id, taskFormData, getToken() || "");
+    closeTaskModal();
+  }
+
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
     item: { id: task.id },
@@ -80,11 +96,16 @@ const KanbanTask = ({ task }: TaskProps) => {
   });
 
   return (
-    <div
-      ref={drag as any}
-      className={`p-2 mb-2 rounded shadow bg-white cursor-pointer hover:bg-opacity-80 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
-    >
-      {task.title}
-    </div>
+    <>
+      <div
+        ref={drag as any}
+        className={`p-2 mb-2 rounded shadow bg-white cursor-pointer hover:bg-opacity-80 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+        onClick={openTaskModal}
+      >
+        {task.title}
+      </div>
+      {/* Task Modal */}
+      {isTaskModalOpen && <TaskModal handleSubmitTask={handleSubmitTask} isOpen={isTaskModalOpen} onClose={closeTaskModal} task={task} />}
+    </>
   );
 };

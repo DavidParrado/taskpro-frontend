@@ -1,27 +1,26 @@
 'use client';
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import z, { set, ZodType } from 'zod';
+import z, { ZodType } from 'zod';
 
 import Select from 'react-select';
 import { getTags } from '@/actions';
 import { getToken } from '@/utils/authHelpers';
-import { ITag } from '@/interfaces';
-import { createTask } from '@/actions/task/createTask';
+import { ITag, ITask } from '@/interfaces';
 import { TaskStatus } from '@/utils/enums';
 
 // Modal setup
 Modal.setAppElement('#root');
 
 // Define the form inputs for the task creation
-type TaskFormInputs = {
+export type TaskFormInputs = {
   title: string;
   description?: string;
   dueDate?: Date;
   status: TaskStatus;
-  tags?: string[];
+  tagIds?: string[];
 };
 
 const taskSchema: ZodType<TaskFormInputs> = z.object({
@@ -29,10 +28,10 @@ const taskSchema: ZodType<TaskFormInputs> = z.object({
   description: z.string().optional(),
   dueDate: z.date().optional(),
   status: z.nativeEnum(TaskStatus),
-  tags: z.string().array().optional(),
+  tagIds: z.string().array().optional(),
 }).refine(({ dueDate }) => {
   if (!dueDate) return true;
-  return dueDate.toLocaleDateString() >= new Date().toLocaleDateString();;
+  return dueDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0);
 }, {
   message: "Due date cannot be in the past",
   path: ['dueDate']
@@ -40,32 +39,36 @@ const taskSchema: ZodType<TaskFormInputs> = z.object({
 
 interface Props {
   isOpen: boolean;
+  task?: ITask;
   onClose: () => void;
-  onCreateTask: (task: TaskFormInputs) => void;
-  projectId: string;
+  handleSubmitTask: (task: TaskFormInputs) => Promise<void>;
 }
 
-export const TaskModal = ({ isOpen, onClose, onCreateTask, projectId }: Props) => {
+export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task }: Props) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [availableTags, setAvailableTags] = useState<ITag[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const { register, handleSubmit, formState: { errors }, setValue, reset, trigger } = useForm<TaskFormInputs>({
-    resolver: zodResolver(taskSchema)
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      title: task?.title || "",
+      description: task?.description || "",
+      dueDate: task?.dueDate ? new Date(task?.dueDate).toLocaleDateString("af-ZA") as any : undefined,
+      status: task?.status,
+      tagIds: task?.tags?.map(tag => tag.id) || [],
+    }
   });
 
   const onSubmit: SubmitHandler<TaskFormInputs> = async (data) => {
     setErrorMessage('');
-    const token = getToken() || "";
-    console.log(data)
-    // Server action
-    const resp = await createTask({ ...data, projectId }, token);
-    if (!resp) {
-      setErrorMessage(resp.message);
-      return;
-    };
-    onCreateTask(resp);
-    reset();
+    try {
+      await handleSubmitTask(data);
+      reset();
+    } catch (error) {
+      console.log(error)
+      setErrorMessage('No se pudo crear/actualizar la tarea');
+    }
   };
 
   useEffect(() => {
@@ -99,7 +102,7 @@ export const TaskModal = ({ isOpen, onClose, onCreateTask, projectId }: Props) =
       contentLabel="Create Task Modal"
     >
       <div ref={modalRef} className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-        <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
+        <h2 className="text-2xl font-bold mb-4">{task ? 'Edit Task' : 'Create New Task'}</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Task Title */}
           <div>
@@ -149,7 +152,8 @@ export const TaskModal = ({ isOpen, onClose, onCreateTask, projectId }: Props) =
               className='mt-1 text-black'
               inputId='task-tags'
               options={availableTags.map(tag => ({ label: tag.name, value: tag.id }))}
-              onChange={(selected) => setValue('tags', selected.map(s => s.value))}
+              defaultValue={task?.tags?.map(tag => ({ label: tag.name, value: tag.id })) || []} // Default selected tags
+              onChange={(selected) => setValue('tagIds', selected.map(s => s.value))}
             />
           </div>
 
@@ -160,6 +164,7 @@ export const TaskModal = ({ isOpen, onClose, onCreateTask, projectId }: Props) =
               className='mt-1 text-black'
               inputId='task-status'
               options={Object.values(TaskStatus).map(status => ({ label: status, value: status }))}
+              defaultValue={task ? { label: task.status, value: task.status } : undefined} // Default selected status
               onChange={(selected) => {
                 setValue('status', selected!.value);
                 trigger('status');
@@ -174,7 +179,7 @@ export const TaskModal = ({ isOpen, onClose, onCreateTask, projectId }: Props) =
               Cancel
             </button>
             <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-              Create Task
+              {task ? 'Save Changes' : 'Create Task'}
             </button>
           </div>
           {errorMessage && <span className="text-indigo-800 text-sm">{errorMessage}</span>}
