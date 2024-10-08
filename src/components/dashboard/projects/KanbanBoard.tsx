@@ -11,9 +11,10 @@ interface Props {
   tasks: ITask[];
   moveTask: (taskId: string, status: TaskStatus) => void;
   handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
+  handleDeleteTask?: (taskId: string) => Promise<void>;
 }
 
-export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask }: Props) => {
+export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask, handleDeleteTask }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-4">
 
@@ -23,6 +24,7 @@ export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask }: Props) => {
         tasks={tasks.filter((task) => task.status === TaskStatus.TODO)}
         moveTask={moveTask}
         handleUpdateTask={handleUpdateTask}
+        handleDeleteTask={handleDeleteTask}
       />
 
       {/* In Progress Column */}
@@ -31,6 +33,7 @@ export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask }: Props) => {
         tasks={tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS)}
         moveTask={moveTask}
         handleUpdateTask={handleUpdateTask}
+        handleDeleteTask={handleDeleteTask}
       />
 
       {/* Completed Column */}
@@ -39,6 +42,7 @@ export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask }: Props) => {
         tasks={tasks.filter((task) => task.status === TaskStatus.COMPLETED)}
         moveTask={moveTask}
         handleUpdateTask={handleUpdateTask}
+        handleDeleteTask={handleDeleteTask}
       />
 
     </div>
@@ -50,9 +54,10 @@ interface ColumnProps {
   tasks: ITask[];
   moveTask: (taskId: string, status: TaskStatus) => void;
   handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
+  handleDeleteTask?: (taskId: string) => Promise<void>;
 }
 
-const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask }: ColumnProps) => {
+const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask, handleDeleteTask }: ColumnProps) => {
   const [{ isOver }, drop] = useDrop({
     accept: ITEM_TYPE,
     drop: (item: { id: string }) => {
@@ -67,7 +72,7 @@ const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask }: ColumnProps
     <div ref={drop as any} className={`p-4 rounded-lg min-h-[300px] ${isOver ? 'bg-indigo-100' : 'bg-gray-200'}`}>
       <h2 className="text-xl font-bold mb-4">{status}</h2>
       {tasks.map((task) => (
-        <KanbanTask key={task.id} task={task} handleUpdateTask={handleUpdateTask} />
+        <KanbanTask key={task.id} task={task} handleUpdateTask={handleUpdateTask} handleDeleteTask={handleDeleteTask} />
       ))}
     </div>
   );
@@ -76,9 +81,10 @@ const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask }: ColumnProps
 interface TaskProps {
   task: ITask;
   handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
+  handleDeleteTask?: (taskId: string) => Promise<void>;
 }
 
-const KanbanTask = ({ task, handleUpdateTask }: TaskProps) => {
+const KanbanTask = ({ task, handleUpdateTask, handleDeleteTask }: TaskProps) => {
   const [isTaskModalOpen, setisTaskModalOpen] = useState(false);
 
   const openTaskModal = () => setisTaskModalOpen(true);
@@ -87,6 +93,15 @@ const KanbanTask = ({ task, handleUpdateTask }: TaskProps) => {
   const handleSubmitTask = async (taskFormData: TaskFormInputs) => {
     // Update task in the server
     await handleUpdateTask(task.id, taskFormData);
+    closeTaskModal();
+  }
+
+  // Delete task
+  const deleteTask = async () => {
+    // Delete task in the server
+    if (handleDeleteTask === undefined && task || handleDeleteTask === undefined)
+      return;
+    await handleDeleteTask(task.id);
     closeTaskModal();
   }
 
@@ -108,7 +123,7 @@ const KanbanTask = ({ task, handleUpdateTask }: TaskProps) => {
         {task.title}
       </div>
       {/* Task Modal */}
-      {isTaskModalOpen && <TaskModal handleSubmitTask={handleSubmitTask} isOpen={isTaskModalOpen} onClose={closeTaskModal} task={task} />}
+      {isTaskModalOpen && <TaskModal handleSubmitTask={handleSubmitTask} isOpen={isTaskModalOpen} onClose={closeTaskModal} task={task} handleDeleteTask={deleteTask} />}
     </>
   );
 };

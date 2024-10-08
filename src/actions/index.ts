@@ -10,3 +10,5 @@ export { getTags } from "./tag/getTags";
 
 export { createTask } from "./task/createTask";
 export { updateTaskStatus } from "./task/updateTaskStatus";
+export { updateTask } from "./task/updateTask";
+export { deleteTask } from "./task/deleteTask";

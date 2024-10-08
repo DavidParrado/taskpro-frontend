@@ -10,7 +10,7 @@ import { IProject } from "@/interfaces";
 import { ProjectStatus, TaskStatus } from "@/utils/enums";
 
 import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskFormInputs, TaskModal } from "@/components"; // Modal to create a new task
-import { updateTaskStatus, getProjectById, updateProject, createTask } from "@/actions";
+import { updateTaskStatus, getProjectById, updateProject, createTask, deleteTask } from "@/actions";
 import { updateTask } from '../../../../actions/task/updateTask';
 
 const ProjectPage = () => {
@@ -56,6 +56,24 @@ const ProjectPage = () => {
         ...project,
         tasks: project.tasks.map((t) => t.id === resp.id ? resp : t)
       }));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // Function to delete a task
+  const handleTaskDelete = async (taskId: string) => {
+    // Delete task in the server
+    try {
+      console.log("EJecutando algo")
+      const resp = await deleteTask(taskId, getToken() || "");
+      if (resp) {
+        setProject((project) => ({
+          ...project,
+          tasks: project.tasks.filter((task) => task.id !== taskId)
+        }));
+      }
+      setIsTaskModalOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -124,7 +142,7 @@ const ProjectPage = () => {
 
         {/* Kanban Board */}
         <DndProvider backend={HTML5Backend}>
-          <KanbanBoard tasks={project.tasks} moveTask={moveTask} handleUpdateTask={handleTaskUpdate} />
+          <KanbanBoard tasks={project.tasks} moveTask={moveTask} handleUpdateTask={handleTaskUpdate} handleDeleteTask={handleTaskDelete} />
         </DndProvider>
 
         {/* Task Modal */}

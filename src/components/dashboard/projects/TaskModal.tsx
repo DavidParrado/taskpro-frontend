@@ -42,9 +42,10 @@ interface Props {
   task?: ITask;
   onClose: () => void;
   handleSubmitTask: (task: TaskFormInputs) => Promise<void>;
+  handleDeleteTask?: (taskId: string) => Promise<void>;
 }
 
-export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task }: Props) => {
+export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task, handleDeleteTask }: Props) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [availableTags, setAvailableTags] = useState<ITag[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -68,6 +69,17 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task }: Props) =>
     } catch (error) {
       console.log(error)
       setErrorMessage('No se pudo crear/actualizar la tarea');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (task && handleDeleteTask) {
+      try {
+        await handleDeleteTask(task.id);
+        onClose();
+      } catch (error) {
+        setErrorMessage('No se pudo eliminar la tarea');
+      }
     }
   };
 
@@ -102,9 +114,19 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task }: Props) =>
       contentLabel="Create Task Modal"
     >
       <div ref={modalRef} className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-        <h2 className="text-2xl font-bold mb-4">{task ? 'Edit Task' : 'Create New Task'}</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className='flex justify-between items-center mb-4'>
           {/* Task Title */}
+          <h2 className="text-2xl font-bold">{task ? 'Edit Task' : 'Create New Task'}</h2>
+          {/* Close button (X) in the top-right corner */}
+          <button
+            className="text-gray-500 hover:text-gray-700 text-xl"
+            onClick={onClose}
+          >
+            &#x2715; {/* Unicode for cross icon (X) */}
+          </button>
+
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="task-title" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Task Title</label>
             <input
@@ -175,9 +197,21 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task }: Props) =>
 
           {/* Buttons */}
           <div className="flex justify-between">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-white text-indigo-900 rounded-md border border-indigo-700">
-              Cancel
-            </button>
+            {/* Delete button appears only when editing a task */}
+            {
+              task ? (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Delete Task
+                </button>
+              ) : <button type="button" onClick={onClose} className="px-4 py-2 bg-white text-indigo-900 rounded-md border border-indigo-700">
+                Cancel
+              </button>
+            }
+
             <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
               {task ? 'Save Changes' : 'Create Task'}
             </button>
