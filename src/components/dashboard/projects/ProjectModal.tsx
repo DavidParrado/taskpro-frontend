@@ -10,8 +10,6 @@ import Modal from 'react-modal';
 import { ProjectStatus } from '@/utils/enums';
 import { ProjectModalSkeleton } from './skeletons/ProjectModalSkeleton';
 import { IProject } from '@/interfaces';
-import { deleteProject } from '@/actions';
-import { getToken } from '@/utils/authHelpers';
 
 Modal.setAppElement('#root'); // To bind modal to the Next.js app
 

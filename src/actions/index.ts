@@ -13,3 +13,5 @@ export { createTask } from "./task/createTask";
 export { updateTaskStatus } from "./task/updateTaskStatus";
 export { updateTask } from "./task/updateTask";
 export { deleteTask } from "./task/deleteTask";
+
+export { getTopics } from "./topics/getTopics";

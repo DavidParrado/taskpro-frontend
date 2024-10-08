@@ -8,6 +8,10 @@ export * from "./dashboard/projects/TaskModal";
 export * from "./dashboard/projects/skeletons/ProjectViewSkeleton";
 export * from "./dashboard/projects/skeletons/ProjectModalSkeleton";
 export * from "./dashboard/projects/KanbanBoard";
+export * from "./dashboard/projects/ai/PopupAI";
+export * from "./dashboard/projects/ai/FailedMessage";
+export * from "./dashboard/projects/ai/SuccessfullMessage";
+export * from "./dashboard/projects/ai/PopupAIForm";
 
 export * from "./ui/Navbar";
 export * from "./ui/Sidebar";

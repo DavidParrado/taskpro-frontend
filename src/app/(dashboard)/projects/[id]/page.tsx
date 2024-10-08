@@ -9,10 +9,10 @@ import { getToken } from "@/utils/authHelpers";
 import { IProject } from "@/interfaces";
 import { ProjectStatus, TaskStatus } from "@/utils/enums";
 
-import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskFormInputs, TaskModal } from "@/components"; // Modal to create a new task
-import { updateTaskStatus, getProjectById, updateProject, createTask, deleteTask, deleteProject } from "@/actions";
-import { updateTask } from '../../../../actions/task/updateTask';
+import { KanbanBoard, PopupAI, ProjectModal, ProjectViewSkeleton, TaskFormInputs, TaskModal } from "@/components"; // Modal to create a new task
+import { updateTaskStatus, getProjectById, updateProject, createTask, deleteTask, deleteProject, updateTask } from "@/actions";
 import { useRouter } from "next/navigation";
+import { generateRandomTasks } from "@/actions/ia/generateRandomTasks";
 
 const ProjectPage = () => {
   const [project, setProject] = useState<IProject>({ name: "Proyecto 1", description: "Description 1", id: "1", createdAt: "2021-10-01T00:00:00.000Z", updatedAt: "2021-10-01T00:00:00.000Z", owner: { id: "1", email: "", name: "", roles: [] }, status: ProjectStatus.IN_PROGRESS, tasks: [] });
@@ -104,6 +104,16 @@ const ProjectPage = () => {
     await updateTaskStatus(taskId, newStatus, getToken() || "");
   };
 
+  const handleCreateRandomTasks = async (data: { quantity: number, topicId: string }) => {
+    // Create random tasks
+    try {
+      const tasks = await generateRandomTasks({ ...data, projectId: project.id }, getToken() || "");
+      setProject((project) => ({ ...project, tasks: [...tasks, ...project.tasks] }));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     setIsLoading(true);
     // Fetch project data from the server
@@ -169,6 +179,7 @@ const ProjectPage = () => {
             handleDeleteProject={handleProjectDelete}
           />
         )}
+        <PopupAI handleCreateRandomTasks={handleCreateRandomTasks} />
       </div>
   );
 };

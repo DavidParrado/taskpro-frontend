@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { Sidebar } from "@/components";
-import { PopupWidget } from "@/components";
 import { Topbar } from "@/components";
 
 export const metadata: Metadata = {
@@ -21,7 +20,6 @@ export default function DashboardLayout({
         <Sidebar />
         <div className="w-full px-8 py-6 overflow-y-auto">{children}</div>
       </div>
-      <PopupWidget />
     </main>
   );
 }
