@@ -4,18 +4,16 @@ import { ITask } from '@/interfaces/task';
 import { TaskStatus } from '@/utils/enums';
 import { useState } from 'react';
 import { TaskFormInputs, TaskModal } from './TaskModal';
-import { updateTaskStatus } from '@/actions';
-import { getToken } from '@/utils/authHelpers';
-import { updateTask } from '@/actions/task/updateTask';
 
 const ITEM_TYPE = 'TASK';
 
 interface Props {
   tasks: ITask[];
   moveTask: (taskId: string, status: TaskStatus) => void;
+  handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
 }
 
-export const KanbanBoard = ({ tasks, moveTask }: Props) => {
+export const KanbanBoard = ({ tasks, moveTask, handleUpdateTask }: Props) => {
   return (
     <div className="grid grid-cols-3 gap-4">
 
@@ -24,6 +22,7 @@ export const KanbanBoard = ({ tasks, moveTask }: Props) => {
         status={TaskStatus.TODO}
         tasks={tasks.filter((task) => task.status === TaskStatus.TODO)}
         moveTask={moveTask}
+        handleUpdateTask={handleUpdateTask}
       />
 
       {/* In Progress Column */}
@@ -31,6 +30,7 @@ export const KanbanBoard = ({ tasks, moveTask }: Props) => {
         status={TaskStatus.IN_PROGRESS}
         tasks={tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS)}
         moveTask={moveTask}
+        handleUpdateTask={handleUpdateTask}
       />
 
       {/* Completed Column */}
@@ -38,6 +38,7 @@ export const KanbanBoard = ({ tasks, moveTask }: Props) => {
         status={TaskStatus.COMPLETED}
         tasks={tasks.filter((task) => task.status === TaskStatus.COMPLETED)}
         moveTask={moveTask}
+        handleUpdateTask={handleUpdateTask}
       />
 
     </div>
@@ -48,9 +49,10 @@ interface ColumnProps {
   status: TaskStatus;
   tasks: ITask[];
   moveTask: (taskId: string, status: TaskStatus) => void;
+  handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
 }
 
-const KanbanColumn = ({ status, tasks, moveTask }: ColumnProps) => {
+const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask }: ColumnProps) => {
   const [{ isOver }, drop] = useDrop({
     accept: ITEM_TYPE,
     drop: (item: { id: string }) => {
@@ -65,7 +67,7 @@ const KanbanColumn = ({ status, tasks, moveTask }: ColumnProps) => {
     <div ref={drop as any} className={`p-4 rounded-lg min-h-[300px] ${isOver ? 'bg-indigo-100' : 'bg-gray-200'}`}>
       <h2 className="text-xl font-bold mb-4">{status}</h2>
       {tasks.map((task) => (
-        <KanbanTask key={task.id} task={task} />
+        <KanbanTask key={task.id} task={task} handleUpdateTask={handleUpdateTask} />
       ))}
     </div>
   );
@@ -73,9 +75,10 @@ const KanbanColumn = ({ status, tasks, moveTask }: ColumnProps) => {
 
 interface TaskProps {
   task: ITask;
+  handleUpdateTask: (taskId: string, task: TaskFormInputs) => Promise<void>;
 }
 
-const KanbanTask = ({ task }: TaskProps) => {
+const KanbanTask = ({ task, handleUpdateTask }: TaskProps) => {
   const [isTaskModalOpen, setisTaskModalOpen] = useState(false);
 
   const openTaskModal = () => setisTaskModalOpen(true);
@@ -83,7 +86,7 @@ const KanbanTask = ({ task }: TaskProps) => {
 
   const handleSubmitTask = async (taskFormData: TaskFormInputs) => {
     // Update task in the server
-    await updateTask(task.id, taskFormData, getToken() || "");
+    await handleUpdateTask(task.id, taskFormData);
     closeTaskModal();
   }
 

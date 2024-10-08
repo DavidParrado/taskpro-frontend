@@ -9,8 +9,9 @@ import { getToken } from "@/utils/authHelpers";
 import { IProject } from "@/interfaces";
 import { ProjectStatus, TaskStatus } from "@/utils/enums";
 
-import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskModal } from "@/components"; // Modal to create a new task
+import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskFormInputs, TaskModal } from "@/components"; // Modal to create a new task
 import { updateTaskStatus, getProjectById, updateProject, createTask } from "@/actions";
+import { updateTask } from '../../../../actions/task/updateTask';
 
 const ProjectPage = () => {
   const [project, setProject] = useState<IProject>({ name: "Proyecto 1", description: "Description 1", id: "1", createdAt: "2021-10-01T00:00:00.000Z", updatedAt: "2021-10-01T00:00:00.000Z", owner: { id: "1", email: "", name: "", roles: [] }, status: ProjectStatus.IN_PROGRESS, tasks: [] });
@@ -26,33 +27,39 @@ const ProjectPage = () => {
   const handleCloseEditModal = () => setIsProjectModalOpen(false);
 
   const handleProjectUpdate = async (updatedProject: any) => {
-    setIsLoading(true);
     try {
       await updateProject(project.id, updatedProject, getToken() || "");
       setProject((project) => ({ ...project, ...updatedProject }));
-      setIsLoading(false);
       setIsProjectModalOpen(false);
     } catch (error) {
       console.error(error);
-      setIsLoading(false);
     }
   }
 
+  // Function to create a new task
   const handleTaskCreate = async (task: any) => {
-    setIsLoading(true);
     try {
       const resp = await createTask({ ...task, projectId: project.id }, getToken() || "");
       console.log(resp);
       setProject((project) => ({ ...project, tasks: [resp, ...project.tasks] }));
       setIsTaskModalOpen(false);
-      setIsLoading(false);
     } catch (error) {
       console.error(error);
       setIsTaskModalOpen(false);
-      setIsLoading(false);
     }
   }
-
+  // Function to update a task
+  const handleTaskUpdate = async (taskId: string, task: TaskFormInputs) => {
+    try {
+      const resp = await updateTask(taskId, task, getToken() || "");
+      setProject((project) => ({
+        ...project,
+        tasks: project.tasks.map((t) => t.id === resp.id ? resp : t)
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const moveTask = async (taskId: string, newStatus: TaskStatus) => {
     // Verify if the status is not the same
@@ -117,7 +124,7 @@ const ProjectPage = () => {
 
         {/* Kanban Board */}
         <DndProvider backend={HTML5Backend}>
-          <KanbanBoard tasks={project.tasks} moveTask={moveTask} />
+          <KanbanBoard tasks={project.tasks} moveTask={moveTask} handleUpdateTask={handleTaskUpdate} />
         </DndProvider>
 
         {/* Task Modal */}
