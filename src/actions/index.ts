@@ -5,6 +5,7 @@ export { getProjectsByUser } from "./projects/getProjectsByUser";
 export { createProject } from "./projects/createProject";
 export { getProjectById } from "./projects/getProjectById";
 export { updateProject } from "./projects/updateProject";
+export * from "./projects/deleteProject";
 
 export { getTags } from "./tag/getTags";
 

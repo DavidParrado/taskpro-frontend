@@ -10,6 +10,8 @@ import Modal from 'react-modal';
 import { ProjectStatus } from '@/utils/enums';
 import { ProjectModalSkeleton } from './skeletons/ProjectModalSkeleton';
 import { IProject } from '@/interfaces';
+import { deleteProject } from '@/actions';
+import { getToken } from '@/utils/authHelpers';
 
 Modal.setAppElement('#root'); // To bind modal to the Next.js app
 
@@ -41,10 +43,11 @@ interface Props {
   isOpen: boolean;
   project?: IProject;
   handleProjectSubmit: (project: ProjectFormInputs) => Promise<void>;
+  handleDeleteProject?: (projectId: string) => Promise<void>;
   onClose: () => void;
 }
 
-export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: Props) => {
+export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project, handleDeleteProject }: Props) => {
   let modalRef = React.useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -71,6 +74,19 @@ export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: 
       setErrorMessage("No se pudo actualizar/crear el proyecto");
     }
     reset();
+  }
+
+  // Handle the delete project passed as a prop
+  const handleDelete = async () => {
+    if (project && project.id && handleDeleteProject) {
+      try {
+        await handleDeleteProject(project.id);
+        onClose();
+      } catch (error) {
+        console.error(error);
+        setErrorMessage("No se pudo eliminar el proyecto");
+      }
+    }
   }
 
   useEffect(() => {
@@ -102,7 +118,18 @@ export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: 
       contentLabel="Create Project Modal"
     >
       <div ref={modalRef} className="bg-white dark:bg-trueGray-900 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
-        <h2 className="text-2xl font-bold mb-4">{project ? 'Edit project' : 'Create New Project'}</h2>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Task Title */}
+          <h2 className="text-2xl font-bold">{project ? 'Edit project' : 'Create New Project'}</h2>
+          {/* Close button (X) in the top-right corner */}
+          <button
+            className="text-gray-500 hover:text-gray-700 text-xl"
+            onClick={onClose}
+          >
+            &#x2715; {/* Unicode for cross icon (X) */}
+          </button>
+
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="project-name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Project Name</label>
@@ -182,9 +209,21 @@ export const ProjectModal = ({ isOpen, onClose, handleProjectSubmit, project }: 
             {errors.endDate?.message && (<span className="text-indigo-900 dark:text-white text-sm">{errors.endDate.message}</span>)}
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={onClose} className={`px-4 py-2 rounded-md border ${project ? 'bg-gray-500 text-white hover:bg-gray-600' : 'bg-white text-indigo-900 border-indigo-700 hover:bg-trueGray-50'}`}>
-              Cancel
-            </button>
+            {
+              project ?
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Delete Project
+                </button>
+                : (
+                  <button type="button" onClick={onClose} className="px-4 py-2 rounded-md border bg-gray-500 text-white hover:bg-gray-600">
+                    Cancel
+                  </button>
+                )
+            }
             <button type="submit" className={`px-4 py-2 text-white rounded-md ${project ? 'bg-blue-600 hover:bg-blue-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
               {project ? 'Save Changes' : 'Create Project'}
             </button>

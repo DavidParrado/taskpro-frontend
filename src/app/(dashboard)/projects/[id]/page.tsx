@@ -10,8 +10,9 @@ import { IProject } from "@/interfaces";
 import { ProjectStatus, TaskStatus } from "@/utils/enums";
 
 import { KanbanBoard, ProjectModal, ProjectViewSkeleton, TaskFormInputs, TaskModal } from "@/components"; // Modal to create a new task
-import { updateTaskStatus, getProjectById, updateProject, createTask, deleteTask } from "@/actions";
+import { updateTaskStatus, getProjectById, updateProject, createTask, deleteTask, deleteProject } from "@/actions";
 import { updateTask } from '../../../../actions/task/updateTask';
+import { useRouter } from "next/navigation";
 
 const ProjectPage = () => {
   const [project, setProject] = useState<IProject>({ name: "Proyecto 1", description: "Description 1", id: "1", createdAt: "2021-10-01T00:00:00.000Z", updatedAt: "2021-10-01T00:00:00.000Z", owner: { id: "1", email: "", name: "", roles: [] }, status: ProjectStatus.IN_PROGRESS, tasks: [] });
@@ -20,6 +21,7 @@ const ProjectPage = () => {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
 
   const openTaskModal = () => setIsTaskModalOpen(true);
   const closeTaskModal = () => setIsTaskModalOpen(false);
@@ -31,6 +33,17 @@ const ProjectPage = () => {
       await updateProject(project.id, updatedProject, getToken() || "");
       setProject((project) => ({ ...project, ...updatedProject }));
       setIsProjectModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const handleProjectDelete = async () => {
+    // Delete project in the server
+    try {
+      await deleteProject(project.id, getToken() || "");
+      // Redirect to the projects page
+      router.replace("/");
     } catch (error) {
       console.error(error);
     }
@@ -65,7 +78,6 @@ const ProjectPage = () => {
   const handleTaskDelete = async (taskId: string) => {
     // Delete task in the server
     try {
-      console.log("EJecutando algo")
       const resp = await deleteTask(taskId, getToken() || "");
       if (resp) {
         setProject((project) => ({
@@ -154,6 +166,7 @@ const ProjectPage = () => {
             project={project}
             onClose={handleCloseEditModal}
             handleProjectSubmit={handleProjectUpdate}
+            handleDeleteProject={handleProjectDelete}
           />
         )}
       </div>
