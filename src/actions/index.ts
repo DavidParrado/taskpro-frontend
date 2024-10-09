@@ -1,3 +1,7 @@
+export { getUser } from './user/getUser';
+export { getUsers } from './user/getUsers';
+export { updateUser } from './user/updateUser';
+
 export { login } from "./auth/login";
 export { registerUser } from "./auth/register";
 

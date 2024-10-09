@@ -113,7 +113,7 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task, handleDelet
       overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       contentLabel="Create Task Modal"
     >
-      <div ref={modalRef} className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+      <div ref={modalRef} className="bg-white dark:bg-trueGray-800 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
         <div className='flex justify-between items-center mb-4'>
           {/* Task Title */}
           <h2 className="text-2xl font-bold">{task ? 'Edit Task' : 'Create New Task'}</h2>
@@ -171,7 +171,7 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task, handleDelet
             <label htmlFor="task-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Tags</label>
             <Select
               isMulti
-              className='mt-1 text-black'
+              className='mt-1 text-black dark:text-white'
               inputId='task-tags'
               options={availableTags.map(tag => ({ label: tag.name, value: tag.id }))}
               defaultValue={task?.tags?.map(tag => ({ label: tag.name, value: tag.id })) || []} // Default selected tags
@@ -183,7 +183,7 @@ export const TaskModal = ({ isOpen, onClose, handleSubmitTask, task, handleDelet
           <div>
             <label htmlFor="task-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
             <Select
-              className='mt-1 text-black'
+              className='mt-1 text-black dark:text-white'
               inputId='task-status'
               options={Object.values(TaskStatus).map(status => ({ label: status, value: status }))}
               defaultValue={task ? { label: task.status, value: task.status } : undefined} // Default selected status
