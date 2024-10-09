@@ -71,24 +71,24 @@ export const RegisterForm = () => {
             <div className="flex">
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faUser} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="text" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="John" {...register('name')} />
+            </div>
               {
                 errors.name?.message && (
-                  <span className='-my-4 text-red-500'>{errors.name.message}</span>
+                  <span className='-my-4 text-indigo-700'>{errors.name.message}</span>
                 )
               }
-            </div>
           </div>
           <div className="w-1/2 px-3 mb-5">
             <label htmlFor="" className="text-xs font-semibold px-1">Apellidos</label>
             <div className="flex">
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faUser} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="text" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="Smith" {...register('lastName')} />
+            </div>
               {
                 errors.lastName?.message && (
-                  <span className='-my-4 text-red-500'>{errors.lastName.message}</span>
+                  <span className='-my-4 text-indigo-700'>{errors.lastName.message}</span>
                 )
               }
-            </div>
           </div>
         </div>
         <div className="flex -mx-3">
@@ -97,13 +97,13 @@ export const RegisterForm = () => {
             <div className="flex">
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faEnvelope} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="email" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="johnsmith@example.com" {...register('email')} />
+          </div>
+            </div>
               {
                 errors.email?.message && (
-                  <span className='-my-4 text-red-500'>{errors.email.message}</span>
+                  <span className='-my-4 text-indigo-700'>{errors.email.message}</span>
                 )
               }
-            </div>
-          </div>
         </div>
         <div className="flex -mx-3">
           <div className="w-full px-3 mb-12">
@@ -111,12 +111,12 @@ export const RegisterForm = () => {
             <div className="flex">
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faLock} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="password" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="************" {...register('password')} />
+            </div>
               {
                 errors.password?.message && (
-                  <span className='-my-4 text-red-500'>{errors.password.message}</span>
+                  <span className='-my-4 text-indigo-700'>{errors.password.message}</span>
                 )
               }
-            </div>
           </div>
         </div>
         <div className="flex -mx-3">
@@ -125,7 +125,7 @@ export const RegisterForm = () => {
             <p className="text-xs text-center text-gray-500 mt-2">Ya tienes una cuenta? <Link href="/auth/login" className="text-indigo-500">Inicia sesión</Link></p>
             {
               errorMessage && (
-                <span className="text-red-500">*{errorMessage}</span>
+                <span className="text-indigo-700">*{errorMessage}</span>
               )
             }
           </div>
