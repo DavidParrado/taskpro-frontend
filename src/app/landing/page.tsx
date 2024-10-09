@@ -7,12 +7,10 @@ export default function Home() {
     <Container>
       <Hero />
       <SectionTitle
-        preTitle="Nextly Benefits"
-        title=" Why should you use this landing page"
+        preTitle="Benefits"
+        title=" Why should you use this application?"
       >
-        Nextly is a free landing page & marketing website template for startups
-        and indie projects. Its built with Next.js & TailwindCSS. And its
-        completely open-source.
+        Taskpro is a task management application that allows you to organize your tasks in a simple and efficient way. It is designed to help you manage your tasks and projects with ease.
       </SectionTitle>
 
     </Container>

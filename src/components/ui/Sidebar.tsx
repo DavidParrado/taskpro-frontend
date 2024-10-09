@@ -7,8 +7,8 @@ import { usePathname, useRouter } from 'next/navigation';
 export const Sidebar = () => {
 
   const routes = [
+    { name: 'Landing', path: '/landing' },
     { name: 'Proyectos', path: '/projects' },
-    { name: 'Tareas', path: '/tasks' },
     { name: 'Equipos', path: '/teams' },
     { name: 'Perfil', path: '/profile' }
   ];

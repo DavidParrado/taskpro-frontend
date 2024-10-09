@@ -78,12 +78,12 @@ const TeamsPage = () => {
       <div className="mt-8">
         <ul>
           {teams.map((team) => (
-            <li key={team.id} className="p-4 mb-4 bg-gray-100 rounded shadow">
+            <li key={team.id} className="p-4 mb-4 bg-gray-100 dark:bg-trueGray-800 rounded shadow">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-bold">{team?.name}</h3>
-                  <p className="text-gray-600">Project: {team?.project?.name}</p>
-                  <p className="text-gray-600">Collaborators: {team?.collaborators?.map(collab => collab.user.name)?.join(", ")}</p>
+                  <h3 className="text-xl font-bold dark:text-white ">{team?.name}</h3>
+                  <p className="text-gray-600 dark:text-gray-100">Project: <span className='dark:text-gray-300'>{team?.project?.name}</span></p>
+                  <p className="text-gray-600 dark:text-gray-100">Collaborators: <span className='dark:text-gray-300'>{team?.collaborators?.map(collab => collab.user.name)?.join(", ")}</span></p>
                 </div>
                 <button
                   onClick={() => openEditTeamModal(team)}
