@@ -15,3 +15,9 @@ export { updateTask } from "./task/updateTask";
 export { deleteTask } from "./task/deleteTask";
 
 export { getTopics } from "./topics/getTopics";
+
+export { getTeamsByProject } from "./teams/getTeamsByProject";
+export { getTeamsByUser } from "./teams/getTeamsByUser";
+export { createTeam } from "./teams/createTeam";
+export { updateTeam } from "./teams/updateTeam";
+export { deleteTeam } from "./teams/deleteTeam";

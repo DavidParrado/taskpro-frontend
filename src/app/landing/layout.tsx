@@ -19,8 +19,8 @@ export default function LandingLayout({
     <>
       <Navbar />
       <div className="xl:px-8">{children}</div>
-      <Footer />
-      <PopupWidget />
+      {/* <Footer /> */}
+      {/* <PopupWidget /> */}
     </>
   );
 }

@@ -30,3 +30,5 @@ export * from "./landing/Faq";
 export * from "./landing/Cta";
 
 export * from "./providers/Providers";
+
+export * from "./dashboard/teams/TeamModal";

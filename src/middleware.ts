@@ -29,5 +29,5 @@ export function middleware(req: NextRequest) {
 
 // Proteger todas las rutas en /dashboard o cualquier otra ruta privada
 export const config = {
-  matcher: ["/", "/projects/:id*"],
+  matcher: ["/", "/projects/:id*", "/teams/:id*", "/tasks/:id*"],
 };

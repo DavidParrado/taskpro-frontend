@@ -69,7 +69,7 @@ const KanbanColumn = ({ status, tasks, moveTask, handleUpdateTask, handleDeleteT
   });
 
   return (
-    <div ref={drop as any} className={`p-4 rounded-lg min-h-[300px] ${isOver ? 'bg-indigo-100' : 'bg-gray-200'}`}>
+    <div ref={drop as any} className={`p-4 rounded-lg min-h-[300px] ${isOver ? 'bg-indigo-100' : 'bg-gray-200 dark:bg-gray-600'}`}>
       <h2 className="text-xl font-bold mb-4">{status}</h2>
       {tasks.map((task) => (
         <KanbanTask key={task.id} task={task} handleUpdateTask={handleUpdateTask} handleDeleteTask={handleDeleteTask} />
@@ -117,7 +117,7 @@ const KanbanTask = ({ task, handleUpdateTask, handleDeleteTask }: TaskProps) => 
     <>
       <div
         ref={drag as any}
-        className={`p-2 mb-2 rounded shadow bg-white cursor-pointer hover:bg-opacity-80 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+        className={`p-2 mb-2 rounded shadow bg-white dark:text-black cursor-pointer hover:bg-opacity-80 ${isDragging ? 'opacity-50' : 'opacity-100'}`}
         onClick={openTaskModal}
       >
         {task.title}

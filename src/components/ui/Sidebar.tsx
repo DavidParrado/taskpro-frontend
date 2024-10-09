@@ -1,7 +1,8 @@
 'use client';
+import { removeToken } from '@/utils/authHelpers';
 // components/Sidebar.tsx
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export const Sidebar = () => {
 
@@ -13,6 +14,12 @@ export const Sidebar = () => {
   ];
   const pathName = usePathname();
   const isActive = (path: string) => pathName.startsWith(path) ? 'bg-indigo-100 dark:bg-gray-800' : '';
+  const router = useRouter();
+
+  const handleLogout = () => {
+    removeToken();
+    router.push('/');
+  };
 
   return (
     <div className="w-64 bg-white dark:bg-trueGray-900 dark:text-slate-300 text-black py-5 px-4 lg:px-6 xl:px-8 border-r dark:border-r-slate-500">
@@ -24,6 +31,7 @@ export const Sidebar = () => {
             </Link>
           </li>
         ))}
+        <button onClick={handleLogout} className='bg-indigo-600 text-white py-2 px-3 rounded hover:bg-indigo-700'>Cerrar sesión</button>
       </ul>
     </div>
   );

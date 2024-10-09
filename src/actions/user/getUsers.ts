@@ -1,0 +1,17 @@
+import { API_URL } from "@/utils/constants";
+
+export const getUsers = async (token: string) => {
+  try {
+    const response = await fetch(`${API_URL}/api/users`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al obtener los usuarios");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error de red o servidor");
+  }
+};
