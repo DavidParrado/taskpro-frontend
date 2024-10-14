@@ -26,7 +26,7 @@ export default function Profile() {
       try {
         const decoded = getDecodedToken();
         const response = await getUser(decoded?.user.id || "", getToken() || "");// Adjust endpoint
-        setUser(response);
+        setUser({...response, password: ''});
       } catch (err) {
         setError('Failed to load profile data');
       }
@@ -51,8 +51,8 @@ export default function Profile() {
 
     try {
       const decoded = getDecodedToken();
-      const response = await updateUser(decoded?.user.id ?? "", user, getToken() || "");// Adjust endpoint
-      setUser(response);
+      const response = await updateUser(decoded?.user.id ?? "", { ...user, password: user.password.length > 0 ? user.password : undefined }, getToken() || "");// Adjust endpoint
+      setUser({ ...response, password: '' });
       setLoading(false);
     } catch (err) {
       setError('Failed to update profile');

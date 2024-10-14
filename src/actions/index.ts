@@ -25,3 +25,5 @@ export { getTeamsByUser } from "./teams/getTeamsByUser";
 export { createTeam } from "./teams/createTeam";
 export { updateTeam } from "./teams/updateTeam";
 export { deleteTeam } from "./teams/deleteTeam";
+
+export { downloadPdf } from "./pdf/downloadPdf";

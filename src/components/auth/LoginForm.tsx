@@ -31,7 +31,7 @@ export const LoginForm = () => {
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator), defaultValues: { email: 'prueba@gmail.com', password: 'Prueba123' } });
+  const { register, handleSubmit, formState: { errors, isValid } } = useForm<FormInputs>({ resolver: zodResolver(schemaValidator) });
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
@@ -70,11 +70,11 @@ export const LoginForm = () => {
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faEnvelope} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="email" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="ejemplo@dominio.com" {...register('email', { required: true })} />
             </div>
-              {
-                errors.email?.message && (
-                  <span className='-my-4 text-indigo-700'>*{errors.email.message}</span>
-                )
-              }
+            {
+              errors.email?.message && (
+                <span className='-my-4 text-indigo-700'>*{errors.email.message}</span>
+              )
+            }
           </div>
         </div>
         <div className="flex -mx-3">
@@ -84,11 +84,11 @@ export const LoginForm = () => {
               <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><FontAwesomeIcon icon={faLock} className="text-gray-400 text-lg"></FontAwesomeIcon></div>
               <input type="password" className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="************" {...register('password', { required: true })} />
             </div>
-              {
-                errors.password?.message && (
-                  <span className='-my-4 text-indigo-700'>*{errors.password.message}</span>
-                )
-              }
+            {
+              errors.password?.message && (
+                <span className='-my-4 text-indigo-700'>*{errors.password.message}</span>
+              )
+            }
           </div>
         </div>
         <div className="flex -mx-3">
