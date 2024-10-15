@@ -6,13 +6,9 @@ import { getDecodedToken, getToken } from "@/utils/authHelpers";
 import { createProject, getProjectsByUser } from "@/actions";
 import { IJwtPayload, IProject } from "@/interfaces";
 
-interface Props {
-  projects?: IProject[];
-}
-
-const ProjectsPage = ({ projects }: Props) => {
+const ProjectsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [projectList, setProjectList] = useState<IProject[]>(projects || []);
+  const [projectList, setProjectList] = useState<IProject[]>([]);
 
   const onClose = () => {
     setIsModalOpen(false);
